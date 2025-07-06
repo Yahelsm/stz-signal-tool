@@ -1,0 +1,25 @@
+name: Shaked Tzafoni Signals
+
+on:
+  schedule:
+    # 16:45 Israel time (15m after NY opens at 09:30 ET = 13:30 UTC)
+    - cron: '45 13 * * 1-5'
+    # 22:45 Israel time (15m before NY closes at 16:00 ET = 20:00 UTC)
+    - cron: '45 19 * * 1-5'
+
+jobs:
+  signal-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with: python-version: '3.10'
+      - run: pip install --upgrade pip
+      - run: pip install -r requirements.txt
+      - name: Run signals
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          SMTP_USER:       ${{ secrets.SMTP_USER }}
+          SMTP_PASS:       ${{ secrets.SMTP_PASS }}
+        run: python main.py -r you@domain.com
+
